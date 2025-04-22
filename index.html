@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Math Speed & Accuracy</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0;
+      display: flex; flex-direction: column;
+      align-items: center; background: #f9f9f9;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    #controls {
+      margin-top: 10px;
+    }
+    #timer {
+      font-size: 1.2em; margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Math Speed & Accuracy Challenge</h2>
+  <div id="timer">Time remaining: 60:00</div>
+  <canvas id="drawCanvas" width="800" height="1130"></canvas>
+  <div id="controls">
+    <button onclick="submitDrawing()">Submit</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("drawCanvas");
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+
+    // Load your worksheet background image
+    const background = new Image();
+    background.src = "math_speed_accuracy_challenge_page1.png";
+    background.onload = () => ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+    // Drawing logic
+    canvas.addEventListener("pointerdown", e => {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener("pointermove", e => {
+      if (drawing) {
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+      }
+    });
+
+    canvas.addEventListener("pointerup", () => drawing = false);
+    canvas.addEventListener("pointerleave", () => drawing = false);
+
+    // Timer logic
+    let timeLeft = 60 * 60; // 1 hour in seconds
+    const timerEl = document.getElementById("timer");
+
+    const interval = setInterval(() => {
+      timeLeft--;
+      const min = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const sec = String(timeLeft % 60).padStart(2, '0');
+      timerEl.textContent = `Time remaining: ${min}:${sec}`;
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        timerEl.textContent = "Time's up!";
+        canvas.removeEventListener("pointerdown", () => {});
+        alert("Time is up! Click submit to save your work.");
+      }
+    }, 1000);
+
+    // Submit drawing
+    function submitDrawing() {
+      const imageData = canvas.toDataURL("image/png");
+      const link = document.createElement('a');
+      link.download = "student_work.png";
+      link.href = imageData;
+      link.click();
+      alert("Work saved. Please email the image to your teacher.");
+    }
+  </script>
+
+</body>
+</html>
